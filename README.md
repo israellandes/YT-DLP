@@ -168,6 +168,12 @@ echo "All downloads completed!"
    ./download_music.sh links.txt
    ```
 
+or with log.
+   
+   ```
+   ./download_music.sh links.txt | tee -a download_music.log
+   ```
+
 This will process each link in the file and download the audio to the specified music directory (by default, `$HOME/Music/Downloads`).
 
 ## Notes
