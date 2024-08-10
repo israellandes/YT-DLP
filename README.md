@@ -49,7 +49,7 @@ Before you begin, ensure you have met the following requirements:
     - Create a `links.txt` file in the root directory.
     - Add YouTube and SoundCloud links (either individual tracks or playlists) you wish to download, one per line.
 
-    **Tip:** You can use the Chrome plugin [Link Gopher](https://chrome.google.com/webstore/detail/link-gopher/bpjdkodgnbfalgghnbeggfbfjpcfamkf?hl=en&pli=1) to quickly gather all the links from a webpage and paste them into your `links.txt` file.
+    **Tip:** You can use the Chrome plugin [Link Gopher](https://chrome.google.com/webstore/detail/link-gopher/bpjdkodgnbfalgghnbeggfbfjpcfamkf?hl=en&pli=1) to quickly gather all the links from a webpage and paste them into your `links.txt` file. This tool works great for collecting both individual track links and playlist links.
 
 2. Run the download script:
 
