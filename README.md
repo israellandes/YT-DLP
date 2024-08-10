@@ -1,6 +1,8 @@
 # YT-DLP Music Downloader
 
-This project provides a simple and efficient way to download music or playlists from YouTube and SoundCloud using `yt-dlp`. The script is designed to handle both individual tracks and playlists, with options for adding metadata and embedding thumbnails.
+## Perfect for DJs
+
+This project provides a simple and efficient way to download music or playlists from YouTube, SoundCloud and Others using `yt-dlp`. The script is designed to handle both individual tracks and playlists, with options for adding metadata and embedding thumbnails.
 
 ## Features
 
