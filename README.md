@@ -1,187 +1,92 @@
-# yt-dlp Installation and Usage Guide
+# YT-DLP Music Downloader
 
-This guide will walk you through installing yt-dlp and using it to download audio from YouTube and SoundCloud.
+This project provides a simple and efficient way to download music or playlists from YouTube and SoundCloud using `yt-dlp`. The script is designed to handle both individual tracks and playlists, with options for adding metadata and embedding thumbnails.
+
+## Features
+
+- Downloads individual tracks or entire playlists from YouTube and SoundCloud.
+- Converts audio to high-quality MP3 format.
+- Adds metadata and embeds thumbnails into downloaded files.
+- Customizable download directory.
+
+## Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+- A Unix-based operating system (Linux, macOS, etc.).
+- Python 3.6+ installed.
+- `yt-dlp` installed within a virtual environment.
 
 ## Installation
 
-1. Save the following script as `install.sh`:
+### For Ubuntu 22.04
 
-```bash
-#!/bin/bash
+1. Clone the repository:
 
-echo "Installing yt-dlp and ffmpeg..."
+    ```bash
+    git clone https://github.com/yourusername/YT-DLP.git
+    cd YT-DLP
+    ```
 
-# Update package list
-sudo apt-get update
+2. Run the installation script specific to Ubuntu 22.04 to set up the virtual environment and install dependencies:
 
-# Install ffmpeg
-sudo apt-get install -y ffmpeg
+    ```bash
+    ./install.sh
+    ```
 
-# Install python3-venv if not already installed
-sudo apt-get install -y python3-venv
-
-# Create a virtual environment
-python3 -m venv $HOME/yt-dlp-env
-
-# Activate the virtual environment
-source $HOME/yt-dlp-env/bin/activate
-
-# Install yt-dlp in the virtual environment
-pip install --upgrade yt-dlp
-
-# Deactivate the virtual environment
-deactivate
-
-# Create a wrapper script to run yt-dlp
-echo '#!/bin/bash
-source $HOME/yt-dlp-env/bin/activate
-$HOME/yt-dlp-env/bin/yt-dlp "$@"
-deactivate' > $HOME/yt-dlp-wrapper.sh
-
-# Make the wrapper script executable
-chmod +x $HOME/yt-dlp-wrapper.sh
-
-echo "Installation complete!"
-echo "To use yt-dlp, run: $HOME/yt-dlp-wrapper.sh [options] [URL]"
-echo "You may want to add an alias to your .bashrc file:"
-echo "echo \"alias yt-dlp='$HOME/yt-dlp-wrapper.sh'\" >> $HOME/.bashrc"
-```
-
-2. Make the script executable:
-   ```
-   chmod +x install.sh
-   ```
-
-3. Run the installation script:
-   ```
-   ./install.sh
-   ```
-
-4. (Optional) Add an alias to your `.bashrc` file:
-   ```
-   echo "alias yt-dlp='$HOME/yt-dlp-wrapper.sh'" >> $HOME/.bashrc
-   ```
-   Then, either restart your terminal or run `source ~/.bashrc` for the changes to take effect.
+    This script will:
+    - Update the package list.
+    - Install `python3-venv` if it's not already installed.
+    - Create a Python virtual environment in your home directory.
+    - Install `yt-dlp` within the virtual environment.
 
 ## Usage
 
-### Direct Usage
+### Downloading Music from YouTube and SoundCloud
 
-You can use yt-dlp directly by running:
+1. Prepare your list of links:
 
-```
-$HOME/yt-dlp-wrapper.sh [options] [URL]
-```
+    - Create a `links.txt` file in the root directory.
+    - Add YouTube and SoundCloud links (either individual tracks or playlists) you wish to download, one per line.
 
-Or, if you've set up the alias:
+    **Tip:** You can use the Chrome plugin [Link Gopher](https://chrome.google.com/webstore/detail/link-gopher/bpjdkodgnbfalgghnbeggfbfjpcfamkf?hl=en&pli=1) to quickly gather all the links from a webpage and paste them into your `links.txt` file.
 
-```
-yt-dlp [options] [URL]
-```
+2. Run the download script:
 
-### Batch Download Script
+    ```bash
+    ./download_music.sh
+    ```
 
-1. Save the following script as `download_music.sh`:
+    - By default, the script will read links from `links.txt`.
+    - If you want to specify a different file, pass the filename as an argument:
 
-```bash
-#!/bin/bash
+    ```bash
+    ./download_music.sh your_links_file.txt
+    ```
 
-# Set the music directory
-MUSIC_DIR="$HOME/Music/Downloads"
+    The script will automatically detect whether the link is for an individual track or a playlist and download accordingly.
 
-# Set the path to the yt-dlp wrapper script
-YT_DLP="$HOME/yt-dlp-wrapper.sh"
+### Script Details
 
-# Create the music directory if it doesn't exist
-mkdir -p "$MUSIC_DIR"
+- **Music Directory:**  
+  The default directory for downloaded music is `~/YT-DLP/Music`. You can change this by modifying the `MUSIC_DIR` variable in the `download_music.sh` script.
 
-# Function to download audio
-download_audio() {
-    local url="$1"
-    $YT_DLP -v -x --audio-format mp3 --audio-quality 0 \
-        -o "$MUSIC_DIR/%(title)s.%(ext)s" \
-        --no-playlist \
-        --add-metadata \
-        --embed-thumbnail \
-        --ignore-errors \
-        --no-overwrites \
-        "$url"
-}
+- **Virtual Environment:**  
+  The script assumes `yt-dlp` is installed in a virtual environment located at `~/yt-dlp-env`. If your environment is elsewhere, update the `YT_DLP` and `source` commands in the script.
 
-# Function to download playlist
-download_playlist() {
-    local url="$1"
-    $YT_DLP -v -x --audio-format mp3 --audio-quality 0 \
-        -o "$MUSIC_DIR/%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s" \
-        --yes-playlist \
-        --add-metadata \
-        --embed-thumbnail \
-        --ignore-errors \
-        --no-overwrites \
-        "$url"
-}
+### Handling Errors
 
-# Check if a file path is provided
-if [ $# -eq 0 ]; then
-    echo "Please provide a file path containing the links."
-    exit 1
-fi
+- If the links file is not found, the script will display an error and exit.
+- The script is designed to ignore errors from `yt-dlp` and continue processing the next link in the list.
 
-# Check if the file exists
-if [ ! -f "$1" ]; then
-    echo "File not found: $1"
-    exit 1
-fi
+### Customization
 
-# Read the file line by line
-while IFS= read -r link || [ -n "$link" ]; do
-    # Skip empty lines
-    [ -z "$link" ] && continue
-    
-    echo "Processing link: $link"
-    
-    # Check if the link is a playlist
-    if [[ $link == *"playlist"* ]] || [[ $link == *"/sets/"* ]]; then
-        echo "Detected playlist. Downloading all songs..."
-        download_playlist "$link"
-    else
-        echo "Detected single track. Downloading..."
-        download_audio "$link"
-    fi
-    
-    echo "Finished processing: $link"
-    echo "------------------------"
-done < "$1"
+- Modify the `download_audio` and `download_playlist` functions in the `download_music.sh` script to change options like audio format or output file structure.
 
-echo "All downloads completed!"
-```
+## Contributing
 
-2. Make the script executable:
-   ```
-   chmod +x download_music.sh
-   ```
+If you'd like to contribute, please fork the repository and make changes as you'd like. Pull requests are warmly welcome.
 
-3. Create a text file (e.g., `links.txt`) with your YouTube and SoundCloud links, one per line.
+## License
 
-4. Run the script:
-   ```
-   ./download_music.sh links.txt
-   ```
-
-or with log.
-   
-   ```
-   ./download_music.sh links.txt | tee -a download_music.log
-   ```
-
-This will process each link in the file and download the audio to the specified music directory (by default, `$HOME/Music/Downloads`).
-
-## Notes
-
-- The download script handles both individual tracks and playlists.
-- It uses verbose mode for detailed output.
-- It embeds thumbnails and metadata.
-- It avoids overwriting existing files to handle duplicates.
-- Audio is downloaded in MP3 format with the best available quality.
-
-Remember to respect copyright laws and terms of service when downloading content.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
